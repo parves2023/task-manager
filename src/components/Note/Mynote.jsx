@@ -10,8 +10,8 @@ function Mynote() {
             
             <Tabs>
                 <TabList>
-                    <Tab>All Notes</Tab>
-                    <Tab>Add Note</Tab>
+                    <Tab>All Tasks</Tab>
+                    <Tab>Add Tasks</Tab>
                 </TabList>
 
                 <TabPanel>

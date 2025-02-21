@@ -135,72 +135,83 @@ function Allnotes() {
 
   return (
     <div className="max-w-4xl mx-auto p-4">
-      <h2 className="text-2xl font-bold text-center mb-6">My Notes</h2>
+      <h2 className="text-2xl font-bold text-center mb-6">My Tasks</h2>
       {/* Search Bar */}
       <div className="mb-6">
         <input
           type="text"
           value={search}
           onChange={handleSearch}
-          placeholder="Search notes by title or content..."
+          placeholder="Search Tasks by title or content..."
           className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
         />
       </div>
       {/* Notes Display */}
-      {filteredNotes.length > 0 ? (
+
+
+
+
+{filteredNotes.length > 0 ? (
   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 w-full">
-    {filteredNotes.map((note) => (
-      <div
-        key={note._id}
-        className="border border-gray-300 rounded-md shadow-md p-4 bg-white flex flex-col h-full"
-      >
-        {note.imageUrl && (
-          <div className="mb-4 w-full">
-            <img
-              src={note.imageUrl}
-              alt={note.title}
-              className="w-full h-64 object-cover rounded-md"
-            />
+    {filteredNotes.map((note) => {
+      const outlineDate = note.outline ? new Date(note.outline) : null;
+      const isPastOutline = outlineDate && outlineDate < new Date();
+      
+      return (
+        <div
+          key={note._id}
+          className={`border border-gray-300 rounded-md shadow-md p-4 flex flex-col h-full ${isPastOutline ? 'bg-red-100' : 'bg-white'}`}
+        >
+          {note.imageUrl && (
+            <div className="mb-4 w-full">
+              <img
+                src={note.imageUrl}
+                alt={note.title}
+                className="w-full h-64 object-cover rounded-md"
+              />
+            </div>
+          )}
+          <h3 className="text-lg font-semibold mb-2">{note.title}</h3>
+          <p className="text-gray-700 mb-4 flex-grow whitespace-pre-line">{note.content}</p>
+          <small className="text-sm text-gray-500">
+            <strong>Category:</strong> {note.category ? note.category : "Not Available"} <br />
+            <strong>Outline:</strong> {outlineDate ? outlineDate.toLocaleDateString('en-GB') : "Not Available"} <br />
+            <strong>Created At:</strong> {new Date(note.createdAt).toLocaleString()}
+          </small>
+          {/* Delete and Edit Buttons */}
+          <div className="flex justify-between mt-4">
+            <button
+              onClick={() => handleDelete(note._id, note.title)}
+              className="bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600"
+            >
+              Delete
+            </button>
+            <button
+              onClick={() => handleEditClick(note)}
+              className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
+            >
+              Edit
+            </button>
           </div>
-        )}
-        <h3 className="text-lg font-semibold mb-2">{note.title}</h3>
-        <p className="text-gray-700 mb-4 flex-grow">{note.content}</p>
-        <small className="text-sm text-gray-500">
-          <strong>Category:</strong> {note.category ? note.category : "Not Available"} <br />
-          <strong>Outline:</strong> {note.outline ? new Date(note.outline).toLocaleDateString('en-GB') : "Not Available"} <br />
-          <strong>Created At:</strong> {new Date(note.createdAt).toLocaleString()}
-        </small>
-        {/* Delete and Edit Buttons */}
-        <div className="flex justify-between mt-4">
-          <button
-            onClick={() => handleDelete(note._id, note.title)}
-            className="bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600"
-          >
-            Delete
-          </button>
-          <button
-            onClick={() => handleEditClick(note)}
-            className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
-          >
-            Edit
-          </button>
+          {/* Edit Note Modal */}
+          {isEditing && selectedNote && selectedNote._id === note._id && (
+            <EditNote
+              noteId={selectedNote._id}
+              initialTitle={selectedNote.title}
+              initialContent={selectedNote.content}
+              onClose={handleClose}
+              onUpdate={handleUpdate}
+            />
+          )}
         </div>
-        {/* Edit Note Modal */}
-        {isEditing && selectedNote && selectedNote._id === note._id && (
-          <EditNote
-            noteId={selectedNote._id}
-            initialTitle={selectedNote.title}
-            initialContent={selectedNote.content}
-            onClose={handleClose}
-            onUpdate={handleUpdate}
-          />
-        )}
-      </div>
-    ))}
+      );
+    })}
   </div>
 ) : (
   <p className="text-center text-gray-500">No notes available.</p>
 )}
+
+
 
     </div>
   );
