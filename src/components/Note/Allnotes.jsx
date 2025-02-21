@@ -148,66 +148,60 @@ function Allnotes() {
       </div>
       {/* Notes Display */}
       {filteredNotes.length > 0 ? (
-        <div className="grid md:grid-cols-3 gap-6">
-          {filteredNotes.map((note) => (
-            <div
-              key={note._id}
-              className="border border-gray-300 rounded-md shadow-md p-4 bg-white"
-            >
-              {note.imageUrl && (
-                <div className="mb-4">
-                  <img
-                    src={note.imageUrl}
-                    alt={note.title}
-                    className="w-full h-64 object-cover rounded-md"
-                  />
-                </div>
-              )}
-              <h3 className="text-lg font-semibold mb-2">{note.title}</h3>
-              <p className="text-gray-700 mb-4">{note.content}</p>
-              <small className="text-sm text-gray-500">
-                <strong>Category:</strong> {note.category ? note.category : "Not Available"} <br />
-                <strong>Outline:</strong> {note.outline ? new Date(note.outline).toLocaleDateString('en-GB') : "Not Available"}
-                
-                <br />
-                <strong>Created At:</strong>{" "}
-                {new Date(note.createdAt).toLocaleString()}
-              </small>
-              {/* Delete Button */}
-             <div className="flex justify-between">
-             <button
-                onClick={() => handleDelete(note._id,note.title)}
-                className="mt-4 bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600"
-              >
-                Delete
-              </button>
-              <button
-        onClick={()=> handleEditClick(note)}
-        className="mt-4 bg-blue-300 text-white py-2 px-4 rounded-md hover:bg-blue-600"
+  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 w-full">
+    {filteredNotes.map((note) => (
+      <div
+        key={note._id}
+        className="border border-gray-300 rounded-md shadow-md p-4 bg-white flex flex-col h-full"
       >
-        Edit
-      </button>
-             
-             </div>
-
-             {isEditing && selectedNote && (
-        <EditNote
-          noteId={selectedNote._id}
-          initialTitle={selectedNote.title}
-          initialContent={selectedNote.content}
-          onClose={handleClose}
-          onUpdate={handleUpdate}
-        />
-      )}
-
-            </div>
-          ))}
-
-          
+        {note.imageUrl && (
+          <div className="mb-4 w-full">
+            <img
+              src={note.imageUrl}
+              alt={note.title}
+              className="w-full h-64 object-cover rounded-md"
+            />
+          </div>
+        )}
+        <h3 className="text-lg font-semibold mb-2">{note.title}</h3>
+        <p className="text-gray-700 mb-4 flex-grow">{note.content}</p>
+        <small className="text-sm text-gray-500">
+          <strong>Category:</strong> {note.category ? note.category : "Not Available"} <br />
+          <strong>Outline:</strong> {note.outline ? new Date(note.outline).toLocaleDateString('en-GB') : "Not Available"} <br />
+          <strong>Created At:</strong> {new Date(note.createdAt).toLocaleString()}
+        </small>
+        {/* Delete and Edit Buttons */}
+        <div className="flex justify-between mt-4">
+          <button
+            onClick={() => handleDelete(note._id, note.title)}
+            className="bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600"
+          >
+            Delete
+          </button>
+          <button
+            onClick={() => handleEditClick(note)}
+            className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
+          >
+            Edit
+          </button>
         </div>
-      ) : (
-        <p className="text-center text-gray-500">No notes available.</p>
-      )}
+        {/* Edit Note Modal */}
+        {isEditing && selectedNote && selectedNote._id === note._id && (
+          <EditNote
+            noteId={selectedNote._id}
+            initialTitle={selectedNote.title}
+            initialContent={selectedNote.content}
+            onClose={handleClose}
+            onUpdate={handleUpdate}
+          />
+        )}
+      </div>
+    ))}
+  </div>
+) : (
+  <p className="text-center text-gray-500">No notes available.</p>
+)}
+
     </div>
   );
 }
