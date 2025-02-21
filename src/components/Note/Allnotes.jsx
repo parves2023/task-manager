@@ -166,8 +166,9 @@ function Allnotes() {
               <h3 className="text-lg font-semibold mb-2">{note.title}</h3>
               <p className="text-gray-700 mb-4">{note.content}</p>
               <small className="text-sm text-gray-500">
-                <strong>By:</strong> {note.userName} | <strong>Email:</strong>{" "}
-                {note.userEmail}
+                <strong>Category:</strong> {note.category ? note.category : "Not Available"} <br />
+                <strong>Outline:</strong> {note.outline ? new Date(note.outline).toLocaleDateString('en-GB') : "Not Available"}
+                
                 <br />
                 <strong>Created At:</strong>{" "}
                 {new Date(note.createdAt).toLocaleString()}
