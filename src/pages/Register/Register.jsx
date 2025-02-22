@@ -69,7 +69,7 @@ const Register = () => {
               createdAt: new Date().toISOString(),
             };
 
-            fetch("http://localhost:5000/users", {
+            fetch("https://task-manager-backend-eight-tau.vercel.app/users", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",

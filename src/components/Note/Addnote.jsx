@@ -44,7 +44,10 @@ const AddNote = () => {
         createdAt: new Date().toISOString(), // Save timestamp
       };
 
-      await axios.post("http://localhost:5000/addnote", newNote);
+      await axios.post(
+        "https://task-manager-backend-eight-tau.vercel.app/addnote",
+        newNote
+      );
       alert("Note added successfully!");
       setNote({
         title: "",

@@ -9,7 +9,7 @@ const AddReview = () => {
       image: form.image.value,
     };
 
-    fetch("http://localhost:5000/reviews", {
+    fetch("https://task-manager-backend-eight-tau.vercel.app/reviews", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newReview),

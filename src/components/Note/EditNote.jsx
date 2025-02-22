@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState } from "react";
+import axios from "axios";
 
 function EditNote({ noteId, initialTitle, initialContent, onClose, onUpdate }) {
   const [title, setTitle] = useState(initialTitle);
@@ -7,14 +7,17 @@ function EditNote({ noteId, initialTitle, initialContent, onClose, onUpdate }) {
 
   const handleUpdate = async () => {
     try {
-      const response = await axios.patch(`http://localhost:5000/notes/${noteId}`, {
-        title,
-        content,
-      });
+      const response = await axios.patch(
+        `https://task-manager-backend-eight-tau.vercel.app/notes/${noteId}`,
+        {
+          title,
+          content,
+        }
+      );
       onUpdate(response.data); // Refresh note data after update
       onClose(); // Close modal
     } catch (error) {
-      console.error('Error updating note:', error);
+      console.error("Error updating note:", error);
     }
   };
 

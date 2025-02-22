@@ -42,7 +42,7 @@ const MyPosts = () => {
       if (result.isConfirmed) {
         try {
           const response = await axios.delete(
-            `http://localhost:5000/posts/${postId}`
+            `https://task-manager-backend-eight-tau.vercel.app/posts/${postId}`
           );
           console.log("Delete response:", response);
 

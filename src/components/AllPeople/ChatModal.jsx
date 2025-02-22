@@ -18,7 +18,7 @@ const ChatModal = ({ chatWith, closeChat }) => {
       };
 
       // Send message to backend
-      fetch("http://localhost:5000/messages", {
+      fetch("https://task-manager-backend-eight-tau.vercel.app/messages", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

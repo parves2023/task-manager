@@ -15,7 +15,7 @@ const GoogleLoginButton = ({ signInGoogle }) => {
         const { displayName, email, photoURL } = user;
 
         // Check if the user exists in the backend
-        fetch("http://localhost:5000/users", {
+        fetch("https://task-manager-backend-eight-tau.vercel.app/users", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

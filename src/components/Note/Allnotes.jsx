@@ -39,6 +39,23 @@ function Allnotes() {
     setSelectedNote(null);
   };
 
+  const fetchNotes = async () => {
+    try {
+      const { data } = await axiosSecure.get(`/notes?email=${user?.email}`);
+      if (data.length > 0) {
+        setNotes(data); // Set all notes
+        categorizeNotes(data); // Categorize notes after fetching
+      } else {
+        setNotes([]); // Handle case where no notes are returned
+        categorizeNotes([]); // Categorize empty notes
+      }
+    } catch (error) {
+      console.error("Error fetching notes:", error.response || error.message);
+    } finally {
+      setLoading(false); // Ensure loading is set to false even in case of an error
+    }
+  };
+
   const handleUpdate = (updatedNote) => {
     console.log("Note Updated:", updatedNote);
     Swal.fire({
@@ -47,22 +64,6 @@ function Allnotes() {
       text: `Note updated successfully`,
     });
 
-    const fetchNotes = async () => {
-      try {
-        const { data } = await axiosSecure.get(`/notes?email=${user?.email}`);
-        if (data.length > 0) {
-          setNotes(data); // Set all notes
-          categorizeNotes(data); // Categorize notes after fetching
-        } else {
-          setNotes([]); // Handle case where no notes are returned
-          categorizeNotes([]); // Categorize empty notes
-        }
-      } catch (error) {
-        console.error("Error fetching notes:", error.response || error.message);
-      } finally {
-        setLoading(false); // Ensure loading is set to false even in case of an error
-      }
-    };
     fetchNotes();
   };
 
@@ -102,26 +103,36 @@ function Allnotes() {
     categorizeNotes(filtered); // Categorize filtered notes
   };
 
-
   const handleCategorySelect = async (id, selectedCategory) => {
     // Show a confirmation dialog using SweetAlert
     const result = await Swal.fire({
-      title: 'Are you sure?',
+      title: "Are you sure?",
       text: `Do you want to change the category to ${selectedCategory}?`,
-      icon: 'question',
+      icon: "question",
       showCancelButton: true,
-      confirmButtonText: 'Yes, change it!',
-      cancelButtonText: 'No, cancel!',
+      confirmButtonText: "Yes, change it!",
+      cancelButtonText: "No, cancel!",
     });
-  
+
     // If the user confirms, perform the action
     if (result.isConfirmed) {
-      // Perform the action (e.g., update the category in the state or API)
-      console.log(`Category changed to ${selectedCategory} for item with ID ${id}`);
-      // Add your logic here to handle the category change
+      try {
+        const response = await axios.patch(
+          `https://task-manager-backend-eight-tau.vercel.app/category/${id}`, // Use the correct `id` parameter
+          { category: selectedCategory } // Include the new category in the request body
+        );
+
+        if (response.status === 200) {
+          fetchNotes(); // Refresh the notes after successful update
+          Swal.fire("Success!", "Category updated successfully.", "success"); // Notify user of success
+        }
+      } catch (error) {
+        console.error("Error updating category:", error);
+        Swal.fire("Error!", "Failed to update category.", "error"); // Notify user of error
+      }
     } else {
       // If the user cancels, do nothing
-      console.log('Category change canceled');
+      console.log("Category change canceled");
     }
   };
 
@@ -140,7 +151,7 @@ function Allnotes() {
     if (result.isConfirmed) {
       try {
         const response = await axios.delete(
-          `http://localhost:5000/notes/${noteId}`
+          `https://task-manager-backend-eight-tau.vercel.app/notes/${noteId}`
         );
         if (response.status === 200) {
           setNotes((prevNotes) =>
@@ -301,10 +312,11 @@ const NoteCard = ({
         </div>
         <br />
         <strong>Outline:</strong>{" "}
-        {outlineDate ? outlineDate.toLocaleDateString("en-GB") : "Not Available"}{" "}
+        {outlineDate
+          ? outlineDate.toLocaleDateString("en-GB")
+          : "Not Available"}{" "}
         <br />
-        <strong>Created At:</strong>{" "}
-        {new Date(note.createdAt).toLocaleString()}
+        <strong>Created At:</strong> {new Date(note.createdAt).toLocaleString()}
       </small>
       {/* Delete and Edit Buttons */}
       <div className="flex justify-between mt-4">
@@ -334,6 +346,5 @@ const NoteCard = ({
     </div>
   );
 };
-
 
 export default Allnotes;

@@ -72,7 +72,7 @@ const Home = () => {
 
       // Submit post to the backend
       const submitResponse = await axios.post(
-        "http://localhost:5000/posts",
+        "https://task-manager-backend-eight-tau.vercel.app/posts",
         postData
       );
 

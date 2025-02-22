@@ -33,7 +33,7 @@ const AllChat = () => {
         timestamp: new Date().toISOString(),
       };
 
-      fetch(`http://localhost:5000/allchat`, {
+      fetch(`https://task-manager-backend-eight-tau.vercel.app/allchat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(message),
