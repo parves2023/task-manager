@@ -8,7 +8,6 @@ import EditNote from "./EditNote";
 function Allnotes() {
   const { user } = useContext(AuthContext); // Get current user
   const [notes, setNotes] = useState([]);
-  const [filteredNotes, setFilteredNotes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState(""); // State for the search bar
   const axiosSecure = useAxiosSecure();
@@ -16,9 +15,23 @@ function Allnotes() {
   const [isEditing, setIsEditing] = useState(false);
   const [selectedNote, setSelectedNote] = useState(null);
 
+  const [todo, setTodo] = useState([]);
+  const [progress, setProgress] = useState([]);
+  const [done, setDone] = useState([]);
+
   const handleEditClick = (note) => {
-    setSelectedNote(note);  // Store the note that was clicked
+    setSelectedNote(note); // Store the note that was clicked
     setIsEditing(true);
+  };
+
+  const categorizeNotes = (notes) => {
+    const todoNotes = notes.filter((note) => note.category === "todo");
+    const progressNotes = notes.filter((note) => note.category === "progress");
+    const doneNotes = notes.filter((note) => note.category === "done");
+
+    setTodo(todoNotes);
+    setProgress(progressNotes);
+    setDone(doneNotes);
   };
 
   const handleClose = () => {
@@ -27,7 +40,6 @@ function Allnotes() {
   };
 
   const handleUpdate = (updatedNote) => {
-    // Here you can update the note in your state or refetch notes
     console.log("Note Updated:", updatedNote);
     Swal.fire({
       icon: "success",
@@ -35,17 +47,15 @@ function Allnotes() {
       text: `Note updated successfully`,
     });
 
-
     const fetchNotes = async () => {
-   // Set loading to true at the start of the request
       try {
         const { data } = await axiosSecure.get(`/notes?email=${user?.email}`);
         if (data.length > 0) {
           setNotes(data); // Set all notes
-          setFilteredNotes(data); // Initially, all notes are shown
+          categorizeNotes(data); // Categorize notes after fetching
         } else {
           setNotes([]); // Handle case where no notes are returned
-          setFilteredNotes([]); // Handle case where no notes are returned
+          categorizeNotes([]); // Categorize empty notes
         }
       } catch (error) {
         console.error("Error fetching notes:", error.response || error.message);
@@ -54,8 +64,6 @@ function Allnotes() {
       }
     };
     fetchNotes();
-
-    
   };
 
   useEffect(() => {
@@ -65,10 +73,10 @@ function Allnotes() {
         const { data } = await axiosSecure.get(`/notes?email=${user?.email}`);
         if (data.length > 0) {
           setNotes(data); // Set all notes
-          setFilteredNotes(data); // Initially, all notes are shown
+          categorizeNotes(data); // Categorize notes after fetching
         } else {
           setNotes([]); // Handle case where no notes are returned
-          setFilteredNotes([]); // Handle case where no notes are returned
+          categorizeNotes([]); // Categorize empty notes
         }
       } catch (error) {
         console.error("Error fetching notes:", error.response || error.message);
@@ -91,15 +99,37 @@ function Allnotes() {
         note.title.toLowerCase().includes(value) ||
         note.content.toLowerCase().includes(value)
     );
-    setFilteredNotes(filtered);
+    categorizeNotes(filtered); // Categorize filtered notes
+  };
+
+
+  const handleCategorySelect = async (id, selectedCategory) => {
+    // Show a confirmation dialog using SweetAlert
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: `Do you want to change the category to ${selectedCategory}?`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, change it!',
+      cancelButtonText: 'No, cancel!',
+    });
+  
+    // If the user confirms, perform the action
+    if (result.isConfirmed) {
+      // Perform the action (e.g., update the category in the state or API)
+      console.log(`Category changed to ${selectedCategory} for item with ID ${id}`);
+      // Add your logic here to handle the category change
+    } else {
+      // If the user cancels, do nothing
+      console.log('Category change canceled');
+    }
   };
 
   // Delete note handler
   const handleDelete = async (noteId, noteTitle) => {
-    // Confirm deletion with Swal
     const result = await Swal.fire({
       title: "Are you sure?",
-      text: `${noteTitle} will be deleted parmanently`,
+      text: `${noteTitle} will be deleted permanently`,
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#d33",
@@ -109,18 +139,14 @@ function Allnotes() {
 
     if (result.isConfirmed) {
       try {
-        // Send request to delete the note
         const response = await axios.delete(
           `http://localhost:5000/notes/${noteId}`
         );
         if (response.status === 200) {
-          // Update local state by filtering out the deleted note
           setNotes((prevNotes) =>
             prevNotes.filter((note) => note._id !== noteId)
           );
-          setFilteredNotes((prevNotes) =>
-            prevNotes.filter((note) => note._id !== noteId)
-          );
+          categorizeNotes(notes.filter((note) => note._id !== noteId)); // Re-categorize after deletion
           Swal.fire("Deleted!", "Your note has been deleted.", "success");
         }
       } catch (error) {
@@ -130,11 +156,10 @@ function Allnotes() {
     }
   };
 
-
   if (loading) return <div>Loading...</div>;
 
   return (
-    <div className="max-w-4xl mx-auto p-4">
+    <div className="container mx-auto p-4">
       <h2 className="text-2xl font-bold text-center mb-6">My Tasks</h2>
       {/* Search Bar */}
       <div className="mb-6">
@@ -147,74 +172,168 @@ function Allnotes() {
         />
       </div>
       {/* Notes Display */}
-
-
-
-
-{filteredNotes.length > 0 ? (
-  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 w-full">
-    {filteredNotes.map((note) => {
-      const outlineDate = note.outline ? new Date(note.outline) : null;
-      const isPastOutline = outlineDate && outlineDate < new Date();
-      
-      return (
-        <div
-          key={note._id}
-          className={`border border-gray-300 rounded-md shadow-md p-4 flex flex-col h-full ${isPastOutline ? 'bg-red-100' : 'bg-white'}`}
-        >
-          {note.imageUrl && (
-            <div className="mb-4 w-full">
-              <img
-                src={note.imageUrl}
-                alt={note.title}
-                className="w-full h-64 object-cover rounded-md"
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 w-full">
+        {/* Todo Column */}
+        <div className="border p-4 rounded-lg bg-gray-50">
+          <h3 className="text-xl font-bold mb-4">Todo</h3>
+          {todo.length > 0 ? (
+            todo.map((note) => (
+              <NoteCard
+                key={note._id}
+                note={note}
+                handleDelete={handleDelete}
+                handleEditClick={handleEditClick}
+                isEditing={isEditing}
+                selectedNote={selectedNote}
+                handleClose={handleClose}
+                handleUpdate={handleUpdate}
+                handleCategorySelect={handleCategorySelect}
               />
-            </div>
-          )}
-          <h3 className="text-lg font-semibold mb-2">{note.title}</h3>
-          <p className="text-gray-700 mb-4 flex-grow whitespace-pre-line">{note.content}</p>
-          <small className="text-sm text-gray-500">
-            <strong>Category:</strong> {note.category ? note.category : "Not Available"} <br />
-            <strong>Outline:</strong> {outlineDate ? outlineDate.toLocaleDateString('en-GB') : "Not Available"} <br />
-            <strong>Created At:</strong> {new Date(note.createdAt).toLocaleString()}
-          </small>
-          {/* Delete and Edit Buttons */}
-          <div className="flex justify-between mt-4">
-            <button
-              onClick={() => handleDelete(note._id, note.title)}
-              className="bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600"
-            >
-              Delete
-            </button>
-            <button
-              onClick={() => handleEditClick(note)}
-              className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
-            >
-              Edit
-            </button>
-          </div>
-          {/* Edit Note Modal */}
-          {isEditing && selectedNote && selectedNote._id === note._id && (
-            <EditNote
-              noteId={selectedNote._id}
-              initialTitle={selectedNote.title}
-              initialContent={selectedNote.content}
-              onClose={handleClose}
-              onUpdate={handleUpdate}
-            />
+            ))
+          ) : (
+            <p className="text-center text-gray-500">No tasks in Todo.</p>
           )}
         </div>
-      );
-    })}
-  </div>
-) : (
-  <p className="text-center text-gray-500">No notes available.</p>
-)}
-
-
-
+        {/* Progress Column */}
+        <div className="border p-4 rounded-lg bg-gray-50">
+          <h3 className="text-xl font-bold mb-4">Progress</h3>
+          {progress.length > 0 ? (
+            progress.map((note) => (
+              <NoteCard
+                key={note._id}
+                note={note}
+                handleDelete={handleDelete}
+                handleEditClick={handleEditClick}
+                isEditing={isEditing}
+                selectedNote={selectedNote}
+                handleClose={handleClose}
+                handleUpdate={handleUpdate}
+                handleCategorySelect={handleCategorySelect}
+              />
+            ))
+          ) : (
+            <p className="text-center text-gray-500">No tasks in Progress.</p>
+          )}
+        </div>
+        {/* Done Column */}
+        <div className="border p-4 rounded-lg bg-gray-50">
+          <h3 className="text-xl font-bold mb-4">Done</h3>
+          {done.length > 0 ? (
+            done.map((note) => (
+              <NoteCard
+                key={note._id}
+                note={note}
+                handleDelete={handleDelete}
+                handleEditClick={handleEditClick}
+                isEditing={isEditing}
+                selectedNote={selectedNote}
+                handleClose={handleClose}
+                handleUpdate={handleUpdate}
+                handleCategorySelect={handleCategorySelect}
+              />
+            ))
+          ) : (
+            <p className="text-center text-gray-500">No tasks in Done.</p>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
+
+// Reusable NoteCard Component
+// Reusable NoteCard Component
+const NoteCard = ({
+  note,
+  handleDelete,
+  handleEditClick,
+  isEditing,
+  selectedNote,
+  handleClose,
+  handleUpdate,
+  handleCategorySelect, // Ensure this is passed as a prop
+}) => {
+  const outlineDate = note.outline ? new Date(note.outline) : null;
+  const isPastOutline = outlineDate && outlineDate < new Date();
+
+  return (
+    <div
+      className={`border border-gray-300 rounded-md shadow-md p-4 flex flex-col my-3 ${
+        isPastOutline ? "bg-red-100" : "bg-white"
+      }`}
+    >
+      {note.imageUrl && (
+        <div className="mb-4 w-full">
+          <img
+            src={note.imageUrl}
+            alt={note.title}
+            className="w-full h-64 object-cover rounded-md"
+          />
+        </div>
+      )}
+      <h3 className="text-lg font-semibold mb-2">{note.title}</h3>
+      <p className="text-gray-700 mb-4 flex-grow whitespace-pre-line">
+        {note.content}
+      </p>
+      <small className="text-sm text-gray-500">
+        <div>
+          <strong>Category:</strong>
+          <select
+            name="category"
+            id="asdf"
+            className="border p-2 ml-2"
+            value={note.category} // Set the default value to note.category
+            onChange={(e) => {
+              const selectedCategory = e.target.value;
+              handleCategorySelect(note._id, selectedCategory); // Pass note._id instead of category._id
+            }}
+          >
+            <option value="todo" disabled={note.category === "todo"}>
+              Todo
+            </option>
+            <option value="progress" disabled={note.category === "progress"}>
+              Progress
+            </option>
+            <option value="done" disabled={note.category === "done"}>
+              Done
+            </option>
+          </select>
+        </div>
+        <br />
+        <strong>Outline:</strong>{" "}
+        {outlineDate ? outlineDate.toLocaleDateString("en-GB") : "Not Available"}{" "}
+        <br />
+        <strong>Created At:</strong>{" "}
+        {new Date(note.createdAt).toLocaleString()}
+      </small>
+      {/* Delete and Edit Buttons */}
+      <div className="flex justify-between mt-4">
+        <button
+          onClick={() => handleDelete(note._id, note.title)}
+          className="bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600"
+        >
+          Delete
+        </button>
+        <button
+          onClick={() => handleEditClick(note)}
+          className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
+        >
+          Edit
+        </button>
+      </div>
+      {/* Edit Note Modal */}
+      {isEditing && selectedNote && selectedNote._id === note._id && (
+        <EditNote
+          noteId={selectedNote._id}
+          initialTitle={selectedNote.title}
+          initialContent={selectedNote.content}
+          onClose={handleClose}
+          onUpdate={handleUpdate}
+        />
+      )}
+    </div>
+  );
+};
+
 
 export default Allnotes;

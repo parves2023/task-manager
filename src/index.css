@@ -8,6 +8,66 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.column {
+  width: 100%;
+  min-height: 300px;
+  background-color: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
+  overflow-y: auto;
+}
+
+.task {
+  padding: 12px;
+  margin-bottom: 8px;
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  cursor: grab;
+}
+
+.task:active {
+  cursor: grabbing;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 html {
     overflow-y: scroll;
     scroll-behavior: smooth;

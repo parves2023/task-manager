@@ -15,6 +15,12 @@ const PrivateRoute = ({ children }) => {
   }, [user, location.pathname, setRedirectPath]);
   
 
+
+  
+
+
+
+  
   if (loading) {
     return (
       <div className="flex justify-center items-start mt-10 h-screen">
@@ -32,13 +38,15 @@ const PrivateRoute = ({ children }) => {
     );
   }
 
+  if(!user){
+    return <Navigate to="/login" />;
+  }
+
   if (user) {
     return children; // If user is authenticated, render the protected component
   }
 
-  if(!user){
-    return <Navigate to="/login" />;
-  }
+
 };
 
 export default PrivateRoute;
