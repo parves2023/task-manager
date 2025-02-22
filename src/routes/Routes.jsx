@@ -8,6 +8,8 @@ import ForgotPass from "../components/ForgotPass";
 import MyProfile from "../components/Profile/MyProfile";
 import UpdateProfile from "../components/Profile/UpdateProfile";
 import Mynote from "../components/Note/Mynote";
+import Aboutus from "../pages/Aboutus";
+import Contact from "../pages/Contact";
 
 const router = createBrowserRouter([
   {
@@ -32,11 +34,11 @@ const router = createBrowserRouter([
       },
       {
         path: "/about-us",
-        element: <div>about us this is </div>,
+        element: <Aboutus></Aboutus>,
       },
       {
         path: "/contact",
-        element: <div>this is contact</div>,
+        element: <Contact></Contact>,
       },
       {
         path: "/my-profile",

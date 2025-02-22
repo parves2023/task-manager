@@ -6,6 +6,10 @@ A full-stack **MERN** (MongoDB, Express.js, React.js, Node.js) Task Manager App 
 
 ## Features ✨
 
+Live link: [Task Manager App](https://task-manager-online.netlify.app/)  
+Client Repo: [GitHub - Client](https://github.com/parves2023/task-manager)  
+Server Repo: [GitHub - Server](https://github.com/parves2023/task-manager-backend)
+
 - **User Authentication**: Signup and Login with JWT-based authentication.
 - **Task Management**:
   - Create, Edit, and Delete tasks.
@@ -18,6 +22,7 @@ A full-stack **MERN** (MongoDB, Express.js, React.js, Node.js) Task Manager App 
   - 🟡 Pending → Yellow
   - 🔵 To-Do → Blue
   - 🟢 Done → Green
+  - 🔴 Overdue → Red (for tasks past their due date)
 - **Responsive UI**: Works seamlessly on both desktop and mobile devices.
 
 ---
@@ -40,7 +45,7 @@ A full-stack **MERN** (MongoDB, Express.js, React.js, Node.js) Task Manager App 
 
 ### 1️⃣ Clone the Repository
 ```bash
-git clone https://github.com/your-username/task-manager.git
+git clone https://github.com/parves2023/task-manager.git
 cd task-manager
 ```
 
@@ -88,6 +93,23 @@ node index.js
 - 🟡 **Pending** → Yellow
 - 🔵 **To-Do** → Blue
 - 🟢 **Done** → Green
+- 🔴 **Overdue** → Red (for tasks past their due date)
+
+---
+
+## Challenges Faced 🛑
+
+1. **Drag and Drop Implementation**:  
+   Initially, I struggled with implementing drag-and-drop functionality using **React DnD**. After several attempts and debugging, I managed to get it working by carefully following the documentation and examples.
+
+2. **Color Coding for Overdue Tasks**:  
+   I added a feature to mark tasks as **red** if they are past their due date. This required additional logic to compare the task's due date with the current date.
+
+3. **No Dark Mode**:  
+   Currently, the app does not support dark mode. This is a feature I plan to add in the future.
+
+4. **Task Status Colors**:  
+   Initially, I forgot to add color coding for **Pending** and **To-Do** tasks. After realizing this, I updated the UI to include yellow for Pending and blue for To-Do tasks.
 
 ---
 
@@ -96,6 +118,8 @@ node index.js
 - **Dark Mode**: Add a toggle for dark and light themes.
 - **Task Due Dates & Reminders**: Set deadlines and receive reminders.
 - **Collaboration**: Add team tasks and shared workspaces.
+- **Task Categories**: Allow users to categorize tasks (e.g., Work, Personal, etc.).
+- **Search & Filter**: Add search and filter options for tasks.
 
 ---
 
@@ -116,7 +140,7 @@ This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) f
 
 ---
 
-🔥 **Developed with ❤️ by [Your Name]**
+🔥 **Developed with ❤️ by Parves Mosarof**
 
 ---
 
